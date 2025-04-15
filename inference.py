@@ -61,6 +61,8 @@ for images in tqdm(test_loader):
     prediction = predict_from_model_outputs(outputs)
 
     for image_id, output, pred in zip(image_ids, outputs, prediction):
+        image_id = int(image_id.split('.')[0])
+        
         for box, score, label in zip(output['boxes'], output['scores'], output['labels']):
             if label > N_CLASSES: continue
 
@@ -71,7 +73,7 @@ for images in tqdm(test_loader):
             box[3] -= box[1]
 
             json_outputs.append({
-                'image_id': int(image_id.split('.')[0]),
+                'image_id': image_id,
                 'bbox': box,
                 'score': score,
                 'category_id': label
