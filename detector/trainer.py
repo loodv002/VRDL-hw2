@@ -93,7 +93,7 @@ class Trainer:
                     sub_loss * loss_weights.get(loss_name, 1.0)
                     for loss_name, sub_loss in losses.items()
                 )
-                loss_sum += loss_weighted_sum
+                loss_sum += loss_weighted_sum.detach().item()
 
                 # Compute validation accuracy
                 model.eval()
