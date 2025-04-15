@@ -153,6 +153,7 @@ class Trainer:
             )
 
             print(f'Epoch {epoch} train loss: {train_loss:.3f}')
+            print(f'Epoch {epoch} train accuracy: {train_accuracy * 100:.3f}%')
             print(f'Epoch {epoch} val loss: {val_loss:.3f}')
             print(f'Epoch {epoch} val accuracy: {val_accuracy * 100:.3f}%')
             print(f'Epoch {epoch} val mAP: {val_map}')
