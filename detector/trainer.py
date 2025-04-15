@@ -105,6 +105,7 @@ class Trainer:
                 n_correct += sum(gt == pred for gt, pred in zip(gt_answer, pred_answer))
                 n_data += len(gt_answer)
 
+        loss_sum /= len(val_loader)
         accuracy = n_correct / n_data
         return loss_sum, mAP.compute(), accuracy
 
