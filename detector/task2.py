@@ -106,20 +106,3 @@ def predict_from_json_file(file_path: str, n_images=13068) -> List[str]:
                       torch.Tensor(scores[image_id]))
         for image_id in range(1, n_images+1)
     ]
-
-if __name__ == '__main__':
-    checkpoint = sys.argv[1]
-    
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
-    with open('./config.yml', 'r') as f:
-        config = yaml.safe_load(f)
-
-    OUTPUT_DIR = config['path']['OUTPUT_DIR']
-
-    prediction = predict_from_json_file(f'{OUTPUT_DIR}/{checkpoint}.json')
-
-    with open(f'{OUTPUT_DIR}/{checkpoint}_v2.csv', 'w') as f:
-        f.write('image_id,pred_label\n')
-        for i, p in enumerate(prediction, 1):
-            f.write(f'{i},{p}\n')
