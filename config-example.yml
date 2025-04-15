@@ -1,0 +1,22 @@
+# If relative path given, it should relative to working directory (instead of project root, etc).
+# Those directories should be manually created before executing programs.
+path:
+  # Data root directory, should include "train", "val" and "test" sub-directory.
+  DATA_DIR: "./data"
+
+  # Model checkpoint and category-id mapping file directory.
+  MODEL_DIR: "./model"
+
+  # Inference file (both .csv and .zip) output directory.
+  OUTPUT_DIR: "./output"
+
+global:
+  N_CLASSES: 10
+
+train: 
+  BATCH_SIZE: 8
+  LEARNING_RATE: 0.001
+  MAX_EPOCHES: 10
+
+  # If enabled, training will stop if the validation loss increases in the last two epochs.
+  EARLY_STOP: true
