@@ -9,17 +9,16 @@ class Detector(nn.Module):
         super(Detector, self).__init__()
 
         self.backbone = fasterrcnn_mobilenet_v3_large_fpn(
-            weights=FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT
+            weights=FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT,
+            pre_nms_top_n_train=1000,
+            post_nms_top_n_train=500,
+            pre_nms_top_n_test=500,
+            post_nms_top_n_test=100,
         )
         
-        self.backbone.rpn.pre_nms_top_n_train = 500
-        self.backbone.rpn.post_nms_top_n_train = 500
-        self.backbone.rpn.pre_nms_top_n_test = 300
-        self.backbone.rpn.post_nms_top_n_test = 300
-
         in_features = self.backbone.roi_heads.box_predictor.cls_score.in_features
         self.backbone.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes + 1)
-
+        
         self.model_name = f'{datetime.now().strftime("%Y%m%d-%H%M%S")}'
 
     def forward(self, *args):
