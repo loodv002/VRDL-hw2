@@ -1,13 +1,13 @@
 # If relative path given, it should relative to working directory (instead of project root, etc).
 # Those directories should be manually created before executing programs.
 path:
-  # Data root directory, should include "train", "val" and "test" sub-directory.
+  # Data root directory, should include "train", "valid" and "test" sub-directory and train.json, valid.json files.
   DATA_DIR: "./data"
 
   # Model checkpoint and category-id mapping file directory.
   MODEL_DIR: "./model"
 
-  # Inference file (both .csv and .zip) output directory.
+  # Inference file (.csv, .json and .zip) output directory.
   OUTPUT_DIR: "./output"
 
 global:
