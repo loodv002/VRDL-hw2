@@ -6,6 +6,7 @@ from torchmetrics.detection.mean_ap import MeanAveragePrecision
 
 
 from tqdm import tqdm
+from collections import defaultdict
 from typing import Dict, Tuple, Optional, Any
 
 from .model import Detector
@@ -22,9 +23,10 @@ class Trainer:
                      model: Detector,
                      train_loader: DataLoader,
                      optimizer: optim.Optimizer,
-                     loss_weights: Dict[str, float]) -> Tuple[float, float]:
+                     loss_weights: Dict[str, float]):
         
         loss_sum = 0
+        sub_losses = defaultdict(int)
         n_correct = 0
         n_data = 0
 
@@ -45,6 +47,8 @@ class Trainer:
                 sub_loss * loss_weights.get(loss_name, 1.0)
                 for loss_name, sub_loss in losses.items()
             )
+            for loss_name, sub_loss in losses.items():
+                sub_losses[loss_name] += sub_loss.detach().item()
 
             optimizer.zero_grad()
             loss_weighted_sum.backward()
@@ -62,15 +66,20 @@ class Trainer:
                 n_data += len(gt_answer)
 
         loss_sum /= len(train_loader)
+        for loss_name in sub_losses.keys():
+            sub_losses[loss_name] /= len(train_loader)
+
         accuracy = n_correct / n_data
-        return loss_sum, accuracy
+
+        return loss_sum, sub_losses, accuracy
 
     def _val_epoch(self,
                    model: Detector,
                    val_loader: DataLoader,
-                   loss_weights: Dict[str, float]) -> Tuple[float, float]:
+                   loss_weights: Dict[str, float]):
         
         loss_sum = 0
+        sub_losses = defaultdict(int)
         mAP = MeanAveragePrecision(iou_type='bbox')
         n_correct = 0
         n_data = 0
@@ -94,6 +103,9 @@ class Trainer:
                     for loss_name, sub_loss in losses.items()
                 )
                 loss_sum += loss_weighted_sum.detach().item()
+                
+                for loss_name, sub_loss in losses.items():
+                    sub_losses[loss_name] += sub_loss.detach().item()
 
                 # Compute validation accuracy
                 model.eval()
@@ -106,8 +118,12 @@ class Trainer:
                 n_data += len(gt_answer)
 
         loss_sum /= len(val_loader)
+        for loss_name in sub_losses.keys():
+            sub_losses[loss_name] /= len(val_loader)
+
         accuracy = n_correct / n_data
-        return loss_sum, mAP.compute(), accuracy
+        
+        return loss_sum, sub_losses, mAP.compute(), accuracy
 
     def train(self,
               model: Detector,
@@ -139,22 +155,24 @@ class Trainer:
         val_accuracies = []
 
         for epoch in range(max_epoches):
-            train_loss, train_accuracy = self._train_epoch(
+            train_loss, train_sub_losses, train_accuracy = self._train_epoch(
                 model,
                 train_loader,
                 optimizer,
                 loss_weights,
             )
 
-            val_loss, val_map, val_accuracy = self._val_epoch(
+            val_loss, val_sub_losses, val_map, val_accuracy = self._val_epoch(
                 model,
                 val_loader,
                 loss_weights,
             )
 
             print(f'Epoch {epoch} train loss: {train_loss:.3f}')
+            print(f'Epoch {epoch} train sublosses: {train_sub_losses}')
             print(f'Epoch {epoch} train accuracy: {train_accuracy * 100:.3f}%')
             print(f'Epoch {epoch} val loss: {val_loss:.3f}')
+            print(f'Epoch {epoch} val sublosses: {val_sub_losses}')
             print(f'Epoch {epoch} val accuracy: {val_accuracy * 100:.3f}%')
             print(f'Epoch {epoch} val mAP: {val_map}')
 
