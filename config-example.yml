@@ -19,4 +19,4 @@ train:
   MAX_EPOCHES: 10
 
   # If enabled, training will stop if the validation loss increases in the last two epochs.
-  EARLY_STOP: true
+  EARLY_STOP: false

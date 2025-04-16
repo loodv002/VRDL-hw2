@@ -57,7 +57,7 @@ params = [p for p in model.parameters() if p.requires_grad]
 optimizer = torch.optim.SGD(params, lr=LEARNING_RATE, momentum=0.9)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.5)
 loss_weights = {
-    'loss_classifier': 1.0,
+    'loss_classifier': 5.0,
     'loss_box_reg': 1.0,
     'loss_objectness': 1.0,
     'loss_rpn_box_reg': 1.0,
